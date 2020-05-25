@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <sys/types.h>
+#include <dirent.h>
+#include <unistd.h>
+// #include <errno.h>
 
 // #include "structs.h"
 // #include "rbt.h"
@@ -218,5 +221,68 @@ void cli(){
 		free(command);
 
 
-	
+}
+
+
+
+
+
+
+int dirCounty(char *countryDir){
+
+	printf("dirCounty------->%s\n", countryDir);
+
+	/* This is just a sample code, modify it to meet your need */
+    
+    struct dirent *de;  // Pointer for directory entry 
+    // opendir() returns a pointer of DIR type.  
+    DIR *dr = opendir(countryDir); 
+  
+    if (dr == NULL){  // opendir returns NULL if couldn't open directory  
+        perror("opendir"); 
+        return 0; 
+    } 
+  
+    //de -> directory entry
+    while ((de = readdir(dr)) != NULL) {
+    	if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) //skip . and ..
+    		continue;
+    	// printf("countryDir: %s\n", countryDir);
+        printf("de->d_name: %s\n", de->d_name);
+
+    	//read file
+		FILE *input;
+
+		char *filepath = malloc((strlen(countryDir) + strlen(de->d_name) + 2) * sizeof(char));
+		sprintf(filepath, "%s/%s",countryDir, de->d_name);
+		printf("filepath %s\n", filepath);
+		
+		input = fopen(filepath, "r");
+		if (input == NULL) {
+			perror("Error opening file\n");
+		}
+		
+		char ee[6], name[13], surname[13], disease[15]; 
+		int id, age;
+
+		while(fscanf(input, "%d %s %s %s %s %d", &id, ee, name, surname, disease, &age) == 6){
+			// printf("id: %d\n", id);
+			// printf("ee: %s\n", ee);
+			// printf("name: %s\n", name);
+			// printf("surname: %s\n", surname);
+			// printf("disease: %s\n", disease);
+			// printf("age: %d\n", age);
+		}
+
+
+
+
+
+    }
+  
+    closedir(dr);     
+    return 0; 
+
+
+
 }

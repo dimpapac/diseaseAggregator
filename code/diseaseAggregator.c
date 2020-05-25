@@ -107,12 +107,15 @@ int main(int argc, char *argv[])
 			strcpy(array[2], readFifosNames[i]);
 			array[3] = malloc(sizeof(char)*(strlen(writeFifosNames[i])+1)); //number of write pipe
 			strcpy(array[3], writeFifosNames[i]);
-			array[4] = NULL; 
+			array[4] = malloc(sizeof(char)*5); //bufferSize
+			sprintf(array[4], "%d", bufferSize);
+			array[5] = NULL; 
 			if (execvp("./Worker", array) < 0) {    
 				perror("*** ERROR: exec failed\n");
 				free(array[1]);
 				free(array[2]);
 				free(array[3]);
+				free(array[4]);
 				exit(1);
 			}
 			printf("kalispera apo worker meta tin exec%d\n", i);
@@ -125,14 +128,6 @@ int main(int argc, char *argv[])
 			// kill(pid, SIGUSR2);
 		}
 	}
-
-	// char array[15];
-	// int retVal = read(fifofds, array, sizeof(array));
-	// if (retVal == -1){
-	// 	perror("read");
-	// 	return -1;
-	// }
-	// printf("%s irthe to minima\n", array);
 
 	// if (fcntl(p[0], F_SETFL, O_NONBLOCK) < 0) 
  //    	return -1; 
@@ -180,33 +175,55 @@ int main(int argc, char *argv[])
     int counter = 0;
     while ((entry = readdir(dir)) != NULL) {
         if (entry->d_type == DT_DIR) {
-            char path[1024]; //size of dir name
+            char *path = malloc(strlen(input_dir) + strlen(entry->d_name) + 2); //size of dir name
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
                 continue;
-            snprintf(path, sizeof(path), "%s/%s", input_dir, entry->d_name);
+            sprintf(path, "%s/%s", input_dir, entry->d_name);
+            path[strlen(path)] = '\0'; 
             // printf("%s\n", entry->d_name);
-            printf("%s\n", path);
-
-            if (write(fifosW[counter], path, sizeof(path)) == -1){ 
+            // printf("%s\n", path);
+            // snprintf(sizeOfMessage, sizeof(int), "%d", strlen(path));
+            // printf("sizeOfMessage   %s\n", sizeOfMessage);
+            int size = (int) strlen(path);
+            // printf("sizeOfMessage dA  -- %d\n", size);
+           	//write size of message 
+           	if (write(fifosW[counter], &size, sizeof(int)) == -1){ 
 				perror("write");
 				return -1;
 			}
+			// sleep(1);
+
+			// write message
+            if (write(fifosW[counter], path, strlen(path) + 1) == -1){ 
+				perror("write");
+				return -1;
+			}
+			sleep(1);
 			counter++;
-			if (counter == numWorkers) counter = 0;
+			if (counter == numWorkers) 
+				counter = 0;
         }
     }
     closedir(dir);
 
+    char *EOM = "EOM";
+    for (int i = 0; i < numWorkers; i++)
+	{
+		int size = (int) strlen(EOM);
+        // printf("sizeOfMessage dA  -- %d\n", size);
+       	//write size of message 
+       	if (write(fifosW[i], &size, sizeof(int)) == -1){ 
+			perror("write");
+			return -1;
+		}
 
-	// while(1){
-	// 	// get filename
-	// 	// readfifonames[counter]
-	// 	// write name of dir in fifo
-	// 	// counter++
-	// 	// if counter>numofworker  counter=0
-	// }
+	    if (write(fifosW[i], EOM, (sizeof(char) * strlen(EOM)) + 1) == -1){ 
+			perror("write EOM");
+			return -1;
+		}
 
-
+	}
+	
     // cli();
 
 

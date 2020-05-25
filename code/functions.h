@@ -8,5 +8,7 @@
 
 
 void cli();
+int dirCounty(char *buffer);
+
 
 #endif
