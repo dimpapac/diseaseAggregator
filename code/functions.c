@@ -9,6 +9,7 @@
 // #include "structs.h"
 // #include "rbt.h"
 #include "functions.h"
+#include "functions1.h"
 // #include "heap.h"
 
 
@@ -228,12 +229,16 @@ void cli(){
 
 
 
-int dirCounty(char *countryDir){
+int dirCounty(char *countryDir, list_node *head, bucket **diseaseHashTable, bucket **countryHashTable, int diseaseHashNum, int countryHashNum, int capacity){
 
-	printf("dirCounty------->%s\n", countryDir);
-
+	// printf("dirCounty------->%s\n", countryDir);
+	// char token[15];
+	char *cp = malloc((strlen(countryDir) + 1) * sizeof(char));
+	strcpy(cp, countryDir);
+	char *country = strtok(cp,"/");
+    country = strtok(NULL, " ");
+    // printf("%s\n", country);
 	/* This is just a sample code, modify it to meet your need */
-    
     struct dirent *de;  // Pointer for directory entry 
     // opendir() returns a pointer of DIR type.  
     DIR *dr = opendir(countryDir); 
@@ -248,15 +253,14 @@ int dirCounty(char *countryDir){
     	if (!strcmp(de->d_name, ".") || !strcmp(de->d_name, "..")) //skip . and ..
     		continue;
     	// printf("countryDir: %s\n", countryDir);
-        printf("de->d_name: %s\n", de->d_name);
+        // printf("de->d_name: %s\n", de->d_name);
 
     	//read file
 		FILE *input;
 
 		char *filepath = malloc((strlen(countryDir) + strlen(de->d_name) + 2) * sizeof(char));
 		sprintf(filepath, "%s/%s",countryDir, de->d_name);
-		printf("filepath %s\n", filepath);
-		
+		// printf("filepath %s\n", filepath);
 		input = fopen(filepath, "r");
 		if (input == NULL) {
 			perror("Error opening file\n");
@@ -272,6 +276,74 @@ int dirCounty(char *countryDir){
 			// printf("surname: %s\n", surname);
 			// printf("disease: %s\n", disease);
 			// printf("age: %d\n", age);
+
+
+			char line[100];
+			sprintf(line, "%d %s %s %s %s %s", id, name, surname, disease, country, de->d_name); 
+			// printf("LINE-----   %s\n", line);
+			entry* new_entry = line_to_entry(line);
+			new_entry->age = age;
+			// print_entry(new_entry);
+
+			if (new_entry == NULL)
+			{
+				printf("problem\n");
+				return -1;
+			}
+			// print_entry(new_entry);
+				
+			if (strcmp(ee,"EXIT") == 0){
+				// printf("\n");
+				// printf("EXIT RECORD\n");
+				// print_entry(new_entry);
+				// printf("\n");
+				char exitDate[40];
+				sprintf(exitDate, "%d/%d/%d", new_entry->entryDate.day, new_entry->entryDate.month, new_entry->entryDate.year);
+				// printf("EXIT DATE ISSSSSSS %s\n", exitDate);
+				int retVal = recordPatientExit(head, new_entry->recordID, exitDate);
+				if (retVal == 0)
+					printf("Record updated\n");
+				else
+					printf("ERROR\n");			
+
+			}
+			else if (strcmp(ee, "ENTER") == 0){
+				printf("\n");
+				printf("ENTER RECORD\n");
+				print_entry(new_entry);
+				printf("\n");
+				if(search(head,  new_entry->recordID) != NULL){
+					printf("%s already exists\n", new_entry->recordID);
+					//free entry
+					free(new_entry->recordID);
+					free(new_entry->patientFirstName);
+					free(new_entry->patientLastName);
+					free(new_entry->diseaseID);
+					free(new_entry->country);
+					free(new_entry);
+					// free(line);
+					// line = NULL;
+					//free data structures
+					free_hash(diseaseHashTable, diseaseHashNum);
+					free_hash(countryHashTable, countryHashNum);
+					free_list(head);
+					//close file
+					// fclose(input);
+					// free(inputfile);
+					return -1; 
+				}
+
+				//insert patient to a sorted list
+				list_node *new_node = sortedInsert(&head, new_entry);
+				//insert patient to hash tables
+				insert_to_hash(diseaseHashTable, diseaseHashNum, new_node->data->diseaseID, new_node, capacity); 
+				insert_to_hash(countryHashTable, countryHashNum, new_node->data->country, new_node, capacity);
+			}
+			else {
+				return -3;
+			}
+
+
 		}
 
 
@@ -280,9 +352,12 @@ int dirCounty(char *countryDir){
 
     }
   
-    closedir(dr);     
+    closedir(dr);
+
+
+    // print_list(head);
+    // print_hash(diseaseHashTable, diseaseHashNum);
+
+
     return 0; 
-
-
-
 }

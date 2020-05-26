@@ -13,6 +13,7 @@
 
 #include "structs.h"
 #include "functions.h"
+// #include "functions1.h"
 // #include "list.h"
 // #include "rbt.h"
 // #include "heap.h"
@@ -54,6 +55,24 @@ int main(int argc, char *argv[])
 	// 	return -1; 
 	// }
 	printf("KALISPERA\n");
+
+	int diseaseHashNum = 7;
+	int countryHashNum = 7;
+	int bucketSize = 70;
+	//initialize hash tables 
+	bucket **diseaseHashTable = malloc(sizeof(bucket *) * diseaseHashNum);
+	bucket **countryHashTable = malloc(sizeof(bucket *) * countryHashNum);
+
+	for (int i = 0; i < diseaseHashNum; i++)
+		diseaseHashTable[i] = NULL;
+
+	for (int i = 0; i < countryHashNum; i++)
+		countryHashTable[i] = NULL;
+	
+	int capacity = (bucketSize - sizeof(struct b*) - sizeof(int) )/ sizeof(bucket_entry);
+	// printf("capacity %d\n", capacity);
+
+	list_node *head = NULL; // head of list 
 
 
 
@@ -114,10 +133,14 @@ int main(int argc, char *argv[])
         	break;
         }
         printf("Received: %s  ----  bytesread: %d -----pid: %d\n", buffer, bytesread, getpid());
-		dirCounty(buffer);
+		dirCounty(buffer, head, diseaseHashTable, countryHashTable, diseaseHashNum, countryHashNum, capacity);
 		// sleep(1);
 	    
 	}
+
+
+
+
 
 
 	

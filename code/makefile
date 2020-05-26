@@ -2,8 +2,8 @@ CFLAGS	= -g3 -Wall
 EXEC	= diseaseAggregator
 CEXEC   = Worker
 
-OBJS	= diseaseAggregator.o functions.o
-COBJS	= Worker.o functions.o
+OBJS	= diseaseAggregator.o functions1.o heap.o rbt.o list.o functions.o
+COBJS	= Worker.o functions1.o heap.o rbt.o list.o functions.o
 
 .PHONY : all clean run
 all: $(EXEC) $(CEXEC) 
