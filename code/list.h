@@ -2,6 +2,11 @@
 #define LIST
 
 #include "structs.h"
+#include "functions.h"
+#include "functions1.h"
+#include "structs.h"
+#include "heap.h"
+
 
 // typedef struct li_node {
 // 	entry *data;

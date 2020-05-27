@@ -13,10 +13,10 @@
 
 #include "structs.h"
 #include "functions.h"
-// #include "functions1.h"
-// #include "list.h"
-// #include "rbt.h"
-// #include "heap.h"
+#include "functions1.h"
+#include "list.h"
+#include "rbt.h"
+#include "heap.h"
 
 
 //function to handle the SIGUSR2 signal 
@@ -145,7 +145,8 @@ int main(int argc, char *argv[])
 
 	
 
-
+    // print_list(head);
+	
 	// close(fifofds);
 
 	printf("Worker with pid= %d exiting...\n", getpid());

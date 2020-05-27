@@ -4,7 +4,7 @@ echo "Your command line contains $# arguments"
 
 if [ $# -ne 5 ] 
 then
-    echo "Usage: ./create_infiles.sh diseasesFile countriesFile input_dir numFilesPerDirectory numRecordsPerFile"
+    echo "Usage: ./create_infiles.sh diseaseFile countriesFile input_dir numFilesPerDirectory numRecordsPerFile"
     exit -1
 fi
 
@@ -19,6 +19,8 @@ NFPD="$4"
 NRPF="$5"
 
 ID=1
+
+declare -a array
 
 random (){
 
@@ -76,7 +78,22 @@ write_file () {
     rand=$[ $RANDOM % 2 ]
     random 0 121
     age=$?
-    echo "$ID ${arr[$rand]} $ret_name $ret_surname $dis $age" >> "$1"
+
+    oldid=$ID
+    if [[ "${arr[$rand]}" == "ENTER" ]];
+    then
+        array+=($ID)
+        # echo "ENTER ENTRY"
+    else
+        # echo "EXIT ENTRY"
+        if [[ "${#array[@]}" != "0" ]]; then
+            # echo "non empty array"
+            oldid=${array[-1]}
+            # echo "$oldid"
+            unset 'array[-1]'
+        fi
+    fi
+    echo "$oldid ${arr[$rand]} $ret_name $ret_surname $dis $age" >> "$1"
     # echo "ade gami" 
     ID=$((ID + 1))
 }
@@ -143,6 +160,8 @@ while IFS= read -r line
 do
     dirName="$INPUT_DIR/$line"
     mkdir -p "$dirName"
+    printf 'array----------------------- %s\n' "${array[@]}"
+    unset array
     make_files "$dirName" "$NFPD" "$NRPF" "$DISEASEFILE"
     # touch "$INPUT_DIR/$line"
     

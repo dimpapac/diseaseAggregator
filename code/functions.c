@@ -298,13 +298,14 @@ int dirCounty(char *countryDir, list_node *head, bucket **diseaseHashTable, buck
 				// print_entry(new_entry);
 				// printf("\n");
 				char exitDate[40];
-				sprintf(exitDate, "%d/%d/%d", new_entry->entryDate.day, new_entry->entryDate.month, new_entry->entryDate.year);
+				sprintf(exitDate, "%d-%d-%d", new_entry->entryDate.day, new_entry->entryDate.month, new_entry->entryDate.year);
 				// printf("EXIT DATE ISSSSSSS %s\n", exitDate);
 				int retVal = recordPatientExit(head, new_entry->recordID, exitDate);
 				if (retVal == 0)
 					printf("Record updated\n");
-				else
+				else{
 					printf("ERROR\n");			
+				}
 
 			}
 			else if (strcmp(ee, "ENTER") == 0){
@@ -355,7 +356,7 @@ int dirCounty(char *countryDir, list_node *head, bucket **diseaseHashTable, buck
     closedir(dr);
 
 
-    // print_list(head);
+    print_list(head);
     // print_hash(diseaseHashTable, diseaseHashNum);
 
 

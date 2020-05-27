@@ -431,17 +431,17 @@ int recordPatientExit(list_node* head, char* recordID, char* exitDate){
 	
 	char *day = strtok(exitDate, "-");
 	if (day == NULL)
-		return -1;
+		return -6;
 	int iday = atoi(day);
 
 	char *month = strtok(NULL, "-");
 	if (month == NULL)
-		return -1;
+		return -6;
 	int imonth = atoi(month);
 
 	char *year = strtok(NULL, " ");
 	if (year == NULL)
-		return -1;
+		return -6;
 	int iyear = atoi(year); 
 
 	if (iday == 0 || imonth == 0 || iyear == 0)
@@ -449,7 +449,7 @@ int recordPatientExit(list_node* head, char* recordID, char* exitDate){
 		printf("wrong date\n");
 		return -2;
 	}
-
+	
 	date given_date;
 	set_date(iday, imonth, iyear, &given_date);
 
@@ -461,7 +461,7 @@ int recordPatientExit(list_node* head, char* recordID, char* exitDate){
 	}
 	else
 	{
-		// printf("id found\n");
+		printf("id found\n");
 		// print_entry(retVal->data);
 		if (earlier(&given_date, &retVal->data->entryDate) == 1)
 		{

@@ -8,6 +8,7 @@
 #include "structs.h"
 #include "list.h"
 #include "functions.h"
+#include "functions1.h"
 #include "heap.h"
 
 

@@ -77,6 +77,7 @@ list_node *search(list_node* head, char *id)
 
 
 void print_list(list_node *head){
+	printf("--------------PRINTING LIST--------------\n");
 	// if (head == NULL)
 	// 	return;
 
