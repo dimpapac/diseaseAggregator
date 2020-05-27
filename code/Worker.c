@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
         	break;
         }
         printf("Received: %s  ----  bytesread: %d -----pid: %d\n", buffer, bytesread, getpid());
-		dirCounty(buffer, head, diseaseHashTable, countryHashTable, diseaseHashNum, countryHashNum, capacity);
+		dirCounty(buffer, &head, diseaseHashTable, countryHashTable, diseaseHashNum, countryHashNum, capacity);
 		// sleep(1);
 	    
 	}
@@ -145,8 +145,8 @@ int main(int argc, char *argv[])
 
 	
 
-    // print_list(head);
-	
+    print_list(head);
+
 	// close(fifofds);
 
 	printf("Worker with pid= %d exiting...\n", getpid());

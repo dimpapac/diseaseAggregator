@@ -229,7 +229,7 @@ void cli(){
 
 
 
-int dirCounty(char *countryDir, list_node *head, bucket **diseaseHashTable, bucket **countryHashTable, int diseaseHashNum, int countryHashNum, int capacity){
+int dirCounty(char *countryDir, list_node **head, bucket **diseaseHashTable, bucket **countryHashTable, int diseaseHashNum, int countryHashNum, int capacity){
 
 	// printf("dirCounty------->%s\n", countryDir);
 	// char token[15];
@@ -300,7 +300,7 @@ int dirCounty(char *countryDir, list_node *head, bucket **diseaseHashTable, buck
 				char exitDate[40];
 				sprintf(exitDate, "%d-%d-%d", new_entry->entryDate.day, new_entry->entryDate.month, new_entry->entryDate.year);
 				// printf("EXIT DATE ISSSSSSS %s\n", exitDate);
-				int retVal = recordPatientExit(head, new_entry->recordID, exitDate);
+				int retVal = recordPatientExit(*head, new_entry->recordID, exitDate);
 				if (retVal == 0)
 					printf("Record updated\n");
 				else{
@@ -313,7 +313,7 @@ int dirCounty(char *countryDir, list_node *head, bucket **diseaseHashTable, buck
 				printf("ENTER RECORD\n");
 				print_entry(new_entry);
 				printf("\n");
-				if(search(head,  new_entry->recordID) != NULL){
+				if(search(*head,  new_entry->recordID) != NULL){
 					printf("%s already exists\n", new_entry->recordID);
 					//free entry
 					free(new_entry->recordID);
@@ -327,7 +327,7 @@ int dirCounty(char *countryDir, list_node *head, bucket **diseaseHashTable, buck
 					//free data structures
 					free_hash(diseaseHashTable, diseaseHashNum);
 					free_hash(countryHashTable, countryHashNum);
-					free_list(head);
+					free_list(*head);
 					//close file
 					// fclose(input);
 					// free(inputfile);
@@ -335,7 +335,7 @@ int dirCounty(char *countryDir, list_node *head, bucket **diseaseHashTable, buck
 				}
 
 				//insert patient to a sorted list
-				list_node *new_node = sortedInsert(&head, new_entry);
+				list_node *new_node = sortedInsert(head, new_entry);
 				//insert patient to hash tables
 				insert_to_hash(diseaseHashTable, diseaseHashNum, new_node->data->diseaseID, new_node, capacity); 
 				insert_to_hash(countryHashTable, countryHashNum, new_node->data->country, new_node, capacity);
@@ -356,7 +356,7 @@ int dirCounty(char *countryDir, list_node *head, bucket **diseaseHashTable, buck
     closedir(dr);
 
 
-    print_list(head);
+    // print_list(*head);
     // print_hash(diseaseHashTable, diseaseHashNum);
 
 

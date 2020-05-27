@@ -9,7 +9,7 @@
 
 
 void cli();
-int dirCounty(char *buffer, list_node *head, bucket **diseaseHashTable, bucket **countryHashTable, int, int, int);
+int dirCounty(char *buffer, list_node **head, bucket **diseaseHashTable, bucket **countryHashTable, int, int, int);
 
 
 #endif
