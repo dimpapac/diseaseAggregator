@@ -17,6 +17,8 @@ int earlier(date *date1, date *date2);
 
 
 rb_node **diseaseIDexists(bucket *my_bucket, char *my_diseaseID);
+int diseaseIDexists2(bucket *my_bucket, char *my_diseaseID);
+
 
 bucket * initialize_bucket(int cap);
 void insert_entry_to_bucket(bucket *last_bucket, char *diseaseID, list_node *new_node, int capacity);

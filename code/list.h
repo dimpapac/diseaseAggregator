@@ -22,4 +22,9 @@ void free_list(list_node *head);
 
 
 
+//list for paths
+paths_list_node* append_path_list(paths_list_node **head, char *new_entry);
+void print_path_list(paths_list_node *head);
+void free_path_list(paths_list_node *head);
+
 #endif

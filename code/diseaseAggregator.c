@@ -139,8 +139,8 @@ int main(int argc, char *argv[])
     	// ret = kill(pids[i], SIGUSR2); //send a signal that i have finished
 
 
-    	printf("%s\n", readFifosNames[i]);
-		if((fifosR[i] = open(readFifosNames[i], O_RDWR | O_NONBLOCK)) < 0){ 
+    	// printf("%s\n", readFifosNames[i]);
+		if((fifosR[i] = open(readFifosNames[i], O_RDONLY | O_NONBLOCK)) < 0){ 
 			perror("error opening read pipes\n");
 		}
 
@@ -149,8 +149,9 @@ int main(int argc, char *argv[])
     	// 	perror("fnctl fifoR");
     	// 	return -1; 
     	// }
-    	printf("%s\n", writeFifosNames[i]);
-		if((fifosW[i] = open(writeFifosNames[i], O_RDWR | O_NONBLOCK)) < 0){ 
+    	// printf("%s\n", writeFifosNames[i]);
+    	sleep(1); //wait for read end to open first
+		if((fifosW[i] = open(writeFifosNames[i], O_WRONLY | O_NONBLOCK)) < 0){ 
 			perror("error opening write pipes\n");
 		}
 
@@ -184,7 +185,7 @@ int main(int argc, char *argv[])
             // printf("%s\n", path);
             // snprintf(sizeOfMessage, sizeof(int), "%d", strlen(path));
             // printf("sizeOfMessage   %s\n", sizeOfMessage);
-            int size = (int) strlen(path);
+            int size = (int) strlen(path) + 1;
             // printf("sizeOfMessage dA  -- %d\n", size);
            	//write size of message 
            	if (write(fifosW[counter], &size, sizeof(int)) == -1){ 
@@ -193,7 +194,7 @@ int main(int argc, char *argv[])
 			}
 			// sleep(1);
 
-			// write message
+			// // write message
             if (write(fifosW[counter], path, strlen(path) + 1) == -1){ 
 				perror("write");
 				return -1;

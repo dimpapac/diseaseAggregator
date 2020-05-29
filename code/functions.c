@@ -301,20 +301,22 @@ int dirCounty(char *countryDir, list_node **head, bucket **diseaseHashTable, buc
 				sprintf(exitDate, "%d-%d-%d", new_entry->entryDate.day, new_entry->entryDate.month, new_entry->entryDate.year);
 				// printf("EXIT DATE ISSSSSSS %s\n", exitDate);
 				int retVal = recordPatientExit(*head, new_entry->recordID, exitDate);
-				if (retVal == 0)
-					printf("Record updated\n");
+				if (retVal == 0){
+					// printf("Record updated\n");
+				}
 				else{
 					printf("ERROR\n");			
 				}
 
 			}
 			else if (strcmp(ee, "ENTER") == 0){
-				printf("\n");
-				printf("ENTER RECORD\n");
-				print_entry(new_entry);
-				printf("\n");
+				// printf("\n");
+				// printf("ENTER RECORD\n");
+				// print_entry(new_entry);
+				// printf("\n");
 				if(search(*head,  new_entry->recordID) != NULL){
-					printf("%s already exists\n", new_entry->recordID);
+					// printf("%s already exists\n", new_entry->recordID); //old output
+ 					printf("ERROR\n");
 					//free entry
 					free(new_entry->recordID);
 					free(new_entry->patientFirstName);
@@ -361,4 +363,42 @@ int dirCounty(char *countryDir, list_node **head, bucket **diseaseHashTable, buc
 
 
     return 0; 
+}
+
+
+
+
+// print entries of bucket	
+void print_ranges(bucket **HashTable, int HashNum){
+	// printf("%d\n", HashNum);
+	for (int i = 0; i < HashNum; i++)
+	{
+		printf("%p\n", HashTable[i]);
+		if (HashTable[i] != NULL)
+		{
+			printf("cur entries: %d for bucket No: %d\n", HashTable[i]->currentNumberOfEntries, i);
+			for (int j = 0; j < HashTable[i]->currentNumberOfEntries; j++)
+			{
+			 	printf("name of entry %d: %s\n", j, HashTable[i]->entries[j].nameOfdiseaseORc);
+			 	printf("Age range 0-20 years: %d cases\n", HashTable[i]->entries[j].range.counter020);
+			 	printf("Age range 21-40 years: %d cases\n", HashTable[i]->entries[j].range.counter2140);
+			 	printf("Age range 41-60 years: %d cases\n", HashTable[i]->entries[j].range.counter4160);
+			 	printf("Age range 60+ years: %d cases\n", HashTable[i]->entries[j].range.counter60);
+			} 
+			bucket * last_bucket = HashTable[i]->next;
+			while (last_bucket != NULL){
+				for (int k = 0; k < last_bucket->currentNumberOfEntries; k++)
+				{
+			 		printf("name of entry %dk: %s\n", k, last_bucket->entries[k].nameOfdiseaseORc);
+				 	printf("Age range 0-20 years: %d cases\n", last_bucket->entries[k].range.counter020);
+				 	printf("Age range 21-40 years: %d cases\n", last_bucket->entries[k].range.counter2140);
+				 	printf("Age range 41-60 years: %d cases\n", last_bucket->entries[k].range.counter4160);
+				 	printf("Age range 60+ years: %d cases\n", last_bucket->entries[k].range.counter60);
+				}
+				last_bucket = last_bucket->next; 
+			}
+			printf("\n");
+		}
+	}
+
 }

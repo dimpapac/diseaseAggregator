@@ -107,3 +107,63 @@ void free_list(list_node *head){
 		// free(tmp);
 	}
 }
+
+
+
+
+
+
+
+
+
+///////list for paths
+
+
+paths_list_node* append_path_list(paths_list_node **head, char *new_entry){
+
+	paths_list_node *new_node = malloc(sizeof(paths_list_node));
+	new_node->path = malloc((strlen(new_entry) + 1) * sizeof(char));
+	strcpy(new_node->path, new_entry);
+	new_node->next = NULL;
+
+	paths_list_node* last = *head;
+	if (*head == NULL) //list is empty 
+	{
+		*head = new_node; 
+	}
+	else
+	{
+		//traverse till the last node 
+		while (last->next != NULL)
+			last = last->next; 
+
+		last->next = new_node; 		
+	}
+
+	return new_node;
+}
+
+
+
+void print_path_list(paths_list_node *head){
+	printf("--------------PRINTING LIST--------------\n");
+	// if (head == NULL)
+	// 	return;
+
+	while(head != NULL){
+		// printf("kalispera apo print list\n");
+		printf("path---> %s \n", head->path);
+		head = head->next;
+	}
+}
+
+
+void free_path_list(paths_list_node *head){
+	paths_list_node *tmp = NULL;
+	while (head != NULL){
+		tmp = head;
+		head = head->next;
+		free(tmp->path);
+		free(tmp);
+	}
+}

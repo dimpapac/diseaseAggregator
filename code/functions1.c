@@ -226,6 +226,10 @@ bucket * initialize_bucket(int cap){
 	for (int i = 0; i < cap; i++)
 	{
 		new_bucket->entries[i].root = NULL;
+		new_bucket->entries[i].range.counter020 = 0;
+		new_bucket->entries[i].range.counter2140 = 0;
+		new_bucket->entries[i].range.counter4160 = 0;
+		new_bucket->entries[i].range.counter60 = 0;
 	}
 	return new_bucket;
 }
@@ -251,6 +255,29 @@ rb_node **diseaseIDexists(bucket *my_bucket, char *my_diseaseID){
 	return NULL;
 }
 
+//check if a string exists in a bucket
+//return null if it doesn't exist
+//else
+//return the record 
+//always call this function after diseaseIDexists
+int diseaseIDexists2(bucket *my_bucket, char *my_diseaseID){
+	bucket * last_bucket = my_bucket;
+	while (last_bucket != NULL){
+		for (int k = 0; k < last_bucket->currentNumberOfEntries; k++)
+		{
+	 		if (strcmp(last_bucket->entries[k].nameOfdiseaseORc,my_diseaseID) == 0)
+	 		{
+	 			// printf("%s already exists\n", my_diseaseID);
+	 			return k; 
+	 		}
+		}
+		last_bucket = last_bucket->next;
+	}
+	// printf("%s not exists\n", my_diseaseID);
+	return -1; //seg if diseaseIDexists not called before
+}
+
+
 
 //insert entry to last bucket of buckets-list
 //if bucket is full allocate a new bucket and connect it with the last bucket of the buckets-list
@@ -267,6 +294,28 @@ void insert_entry_to_bucket(bucket *last_bucket, char *diseaseIDorc, list_node *
 		last_bucket->entries[last_bucket->currentNumberOfEntries].root->listPtr = new_node;
 
 		last_bucket->currentNumberOfEntries++;
+
+		//field 3
+		if (new_node->data->age > 0 && new_node->data->age < 21){
+			// printf("mikros %d\n", new_node->data->age);
+			last_bucket->entries[last_bucket->currentNumberOfEntries].range.counter020++;
+		}
+		else if (new_node->data->age > 20 && new_node->data->age < 41){
+			// printf("mikromesaios %d\n", new_node->data->age);
+			last_bucket->entries[last_bucket->currentNumberOfEntries].range.counter2140++;
+		}
+		else if (new_node->data->age > 40 && new_node->data->age < 61){
+			// printf("mesaios %d\n", new_node->data->age);
+			last_bucket->entries[last_bucket->currentNumberOfEntries].range.counter4160++;
+		}
+		else if (new_node->data->age > 60){
+			// printf("megalos %d\n", new_node->data->age);
+			last_bucket->entries[last_bucket->currentNumberOfEntries].range.counter60++;
+		}
+		else{
+			printf("problem\n");
+		}
+
 	}	
 	else //needs a new bucket
 	{
@@ -282,6 +331,27 @@ void insert_entry_to_bucket(bucket *last_bucket, char *diseaseIDorc, list_node *
 
 		new_bucket->currentNumberOfEntries++;
 		last_bucket->next = new_bucket;	
+
+		//field 3
+		if (new_node->data->age > 0 && new_node->data->age < 21){
+			// printf("mikros %d\n", new_node->data->age);
+			new_bucket->entries[0].range.counter020++;
+		}
+		else if (new_node->data->age > 20 && new_node->data->age < 41){
+			// printf("mikromesaios %d\n", new_node->data->age);
+			new_bucket->entries[0].range.counter2140++;
+		}
+		else if (new_node->data->age > 40 && new_node->data->age < 61){
+			// printf("mesaios %d\n", new_node->data->age);
+			new_bucket->entries[0].range.counter4160++;
+		}
+		else if (new_node->data->age > 60){
+			// printf("megalos %d\n", new_node->data->age);
+			new_bucket->entries[0].range.counter60++;
+		}
+		else{
+			printf("problem\n");
+		}
 	}
 }
 
@@ -303,6 +373,28 @@ void insert_to_hash(bucket **diseaseHashTable, int diseaseHashNum, char * string
 		//deikti red black komvou = new_node
 		diseaseHashTable[hashValue]->entries[0].root->listPtr = new_node;
 		diseaseHashTable[hashValue]->currentNumberOfEntries = 1;
+
+		//field 3
+		if (new_node->data->age > 0 && new_node->data->age < 21){
+			// printf("mikros %d\n", new_node->data->age);
+			diseaseHashTable[hashValue]->entries[0].range.counter020++;
+		}
+		else if (new_node->data->age > 20 && new_node->data->age < 41){
+			// printf("mikromesaios %d\n", new_node->data->age);
+			diseaseHashTable[hashValue]->entries[0].range.counter2140++;
+		}
+		else if (new_node->data->age > 40 && new_node->data->age < 61){
+			// printf("mesaios %d\n", new_node->data->age);
+			diseaseHashTable[hashValue]->entries[0].range.counter4160++;
+		}
+		else if (new_node->data->age > 60){
+			// printf("megalos %d\n", new_node->data->age);
+			diseaseHashTable[hashValue]->entries[0].range.counter60++;
+		}
+		else{
+			printf("problem\n");
+		}
+
 	}
 	else
 	{	
@@ -319,6 +411,32 @@ void insert_to_hash(bucket **diseaseHashTable, int diseaseHashNum, char * string
 			rb_node * new_tree_node= newRBTNode(&new_node->data->entryDate);
 			new_tree_node->listPtr = new_node;
 			insert(root, new_tree_node);
+
+			int numberOfEntry = diseaseIDexists2(diseaseHashTable[hashValue], string);
+
+			//field 3
+			if (new_node->data->age > 0 && new_node->data->age < 21){
+				// printf("mikros %d\n", new_node->data->age);
+				diseaseHashTable[hashValue]->entries[numberOfEntry].range.counter020++;
+			}
+			else if (new_node->data->age > 20 && new_node->data->age < 41){
+				// printf("mikromesaios %d\n", new_node->data->age);
+				diseaseHashTable[hashValue]->entries[numberOfEntry].range.counter2140++;
+			}
+			else if (new_node->data->age > 40 && new_node->data->age < 61){
+				// printf("mesaios %d\n", new_node->data->age);
+				diseaseHashTable[hashValue]->entries[numberOfEntry].range.counter4160++;
+			}
+			else if (new_node->data->age > 60){
+				// printf("megalos %d\n", new_node->data->age);
+				diseaseHashTable[hashValue]->entries[numberOfEntry].range.counter60++;
+			}
+			else{
+				printf("problem\n");
+			}
+
+
+
 		}
 	}
 }
@@ -449,23 +567,25 @@ int recordPatientExit(list_node* head, char* recordID, char* exitDate){
 		printf("wrong date\n");
 		return -2;
 	}
-	
+
 	date given_date;
 	set_date(iday, imonth, iyear, &given_date);
 
 	list_node *retVal = search(head, recordID);
 	if (retVal == NULL)
 	{
-		printf("id not found\n");
+		// printf("id not found\n"); //previous output
+		// printf("ERROR\n");
 		return -3;
 	}
 	else
 	{
-		printf("id found\n");
+		// printf("id found\n");
 		// print_entry(retVal->data);
 		if (earlier(&given_date, &retVal->data->entryDate) == 1)
 		{
-			printf("Given date is earlier than patient's entryDate\n");
+			// printf("Given date is earlier than patient's entryDate\n"); //first output
+			// printf("ERROR\n");
 			return -2;
 		}
 		else

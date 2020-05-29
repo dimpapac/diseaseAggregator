@@ -9,6 +9,15 @@
 // #include "functions.h"
 
 
+typedef struct range{
+	int counter020;
+	int counter2140;
+	int counter4160;
+	int counter60;
+}ranges;
+
+
+
 typedef struct {
 	int day;
 	int month;
@@ -31,6 +40,11 @@ typedef struct li_node {
 	struct li_node *next;
 } list_node;
 
+typedef struct paths_li_node {
+	char *path;
+	struct paths_li_node *next;
+} paths_list_node;
+
 typedef struct rbt_node{
 	//data of node	
 	list_node *listPtr; //pointer to patients-list
@@ -42,8 +56,9 @@ typedef struct rbt_node{
 } rb_node;
 
 typedef struct {
-	char *nameOfdiseaseORc;
-	rb_node *root;
+	char *nameOfdiseaseORc; //field 1
+	rb_node *root; //field 2
+	ranges range; //field 3
 } bucket_entry;
 
 typedef struct b{
