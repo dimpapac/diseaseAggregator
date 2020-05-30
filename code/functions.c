@@ -226,10 +226,117 @@ void cli(){
 
 
 
+void write_stats(bucket **HashTable,  int HashNum, char *date, char *country, int fifosW){
+	char string[1000];
+
+	sprintf(string, "%s", date);
+	sprintf(string, "%s\n%s", string, country);
+
+	// printf("string->%s\n", string);
+
+	// printf("date: %s ---- country: %s\n", date, country);
+	// printf("%d\n", HashNum);
+	for (int i = 0; i < HashNum; i++)
+	{
+		// printf("%p\n", HashTable[i]);
+		if (HashTable[i] != NULL)
+		{
+			// printf("cur entries: %d for bucket No: %d\n", HashTable[i]->currentNumberOfEntries, i);
+			for (int j = 0; j < HashTable[i]->currentNumberOfEntries; j++)
+			{
+			 	sprintf(string, "%s\n%s\n", string, HashTable[i]->entries[j].nameOfdiseaseORc);
+			 	sprintf(string, "%sAge range 0-20 years: %d cases\n", string, HashTable[i]->entries[j].range.counter020);
+			 	// HashTable[i]->entries[j].range.counter020 = 0;
+			 	sprintf(string, "%sAge range 21-40 years: %d cases\n", string, HashTable[i]->entries[j].range.counter2140);
+			 	// HashTable[i]->entries[j].range.counter2140 = 0;
+			 	sprintf(string, "%sAge range 41-60 years: %d cases\n", string, HashTable[i]->entries[j].range.counter4160);
+			 	// HashTable[i]->entries[j].range.counter4160 = 0;
+			 	sprintf(string, "%sAge range 60+ years: %d cases\n", string, HashTable[i]->entries[j].range.counter60);
+			 	// HashTable[i]->entries[j].range.counter60 = 0;
+			} 
+			bucket * last_bucket = HashTable[i]->next;
+			while (last_bucket != NULL){
+				for (int k = 0; k < last_bucket->currentNumberOfEntries; k++)
+				{
+			 		sprintf(string, "%s\n%s\n", string, last_bucket->entries[k].nameOfdiseaseORc);
+				 	sprintf(string, "%sAge range 0-20 years: %d cases\n", string, last_bucket->entries[k].range.counter020);
+				 	// last_bucket->entries[k].range.counter020 = 0;
+				 	sprintf(string, "%sAge range 21-40 years: %d cases\n", string, last_bucket->entries[k].range.counter2140);
+				 	// last_bucket->entries[k].range.counter2140 = 0;
+				 	sprintf(string, "%sAge range 41-60 years: %d cases\n", string, last_bucket->entries[k].range.counter4160);
+				 	// last_bucket->entries[k].range.counter4160 = 0;
+				 	sprintf(string, "%sAge range 60+ years: %d cases\n", string, last_bucket->entries[k].range.counter60);
+				 	// last_bucket->entries[k].range.counter60 = 0;
+				}
+				last_bucket = last_bucket->next; 
+			}
+			// printf("\n");
+		}
+	}
+
+	
+	//write to fifoW
+	// printf("%s\n", string);
+	int size = (int) strlen(string) + 1;
+	// printf("STRLEN STRING %d\n", (int) strlen(string));
+	if (write(fifosW, &size, sizeof(int)) == -1){ 
+		perror("write");
+		// return -1;
+	}
+
+
+	printf("STRLEN STRING %d\n", (int) strlen(string));
+	if (write(fifosW, string, size) == -1){ 
+		perror("write");
+		// return -1;
+	}
 
 
 
-int dirCounty(char *countryDir, list_node **head, bucket **diseaseHashTable, bucket **countryHashTable, int diseaseHashNum, int countryHashNum, int capacity){
+
+	strcpy(string, " ");
+
+
+	//reset counters to 0
+	for (int i = 0; i < HashNum; i++)
+	{
+		// printf("%p\n", HashTable[i]);
+		if (HashTable[i] != NULL)
+		{
+			// printf("cur entries: %d for bucket No: %d\n", HashTable[i]->currentNumberOfEntries, i);
+			for (int j = 0; j < HashTable[i]->currentNumberOfEntries; j++)
+			{
+			 	HashTable[i]->entries[j].range.counter020 = 0;
+			 	HashTable[i]->entries[j].range.counter2140 = 0;
+			 	HashTable[i]->entries[j].range.counter4160 = 0;
+			 	HashTable[i]->entries[j].range.counter60 = 0;
+			} 
+			bucket * last_bucket = HashTable[i]->next;
+			while (last_bucket != NULL){
+				for (int k = 0; k < last_bucket->currentNumberOfEntries; k++)
+				{
+				 	last_bucket->entries[k].range.counter020 = 0;
+				 	last_bucket->entries[k].range.counter2140 = 0;
+				 	last_bucket->entries[k].range.counter4160 = 0;
+				 	last_bucket->entries[k].range.counter60 = 0;
+				}
+				last_bucket = last_bucket->next; 
+			}
+			// printf("\n");
+		}
+	}
+
+
+
+
+}
+
+
+
+
+
+
+int dirCounty(char *countryDir, list_node **head, bucket **diseaseHashTable, bucket **countryHashTable, int diseaseHashNum, int countryHashNum, int capacity, int fifosW){
 
 	// printf("dirCounty------->%s\n", countryDir);
 	// char token[15];
@@ -345,16 +452,18 @@ int dirCounty(char *countryDir, list_node **head, bucket **diseaseHashTable, buc
 			else {
 				return -3;
 			}
-
-
 		}
-
-
-
-
-
+			
+		write_stats(diseaseHashTable, diseaseHashNum, de->d_name, country, fifosW);
     }
-  
+ 	
+ // 	//write -15 indication that i finished with stats
+ // 	int end = -15;
+	// if (write(fifosW, &end, sizeof(int)) == -1){ 
+	// 	perror("write");
+	// 	// return -1;
+	// }
+
     closedir(dr);
 
 

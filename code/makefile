@@ -15,7 +15,7 @@ clean:
 	rm -f $(OBJS) $(EXEC) $(COBJS) $(CEXEC)
 
 run: $(EXEC) $(CEXEC)
-	./diseaseAggregator -w 1 -b 256 -i input_dir
+	./diseaseAggregator -w 5 -b 256 -i input_dir
 	
 val: $(EXEC) 
 	valgrind -v --leak-check=full --show-leak-kinds=all ./diseaseAggregator \

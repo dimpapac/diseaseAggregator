@@ -117,19 +117,35 @@ int main(int argc, char *argv[])
 	    printf("Received: %s  ----  bytesread: %d -----pid: %d\n", buffer, bytesread, getpid());
 		append_path_list(&path_head, buffer);
 
-		// dirCounty(buffer, &head, diseaseHashTable, countryHashTable, diseaseHashNum, countryHashNum, capacity);
 		// sleep(1);
 	}
 
-	
+	paths_list_node * cur = path_head;
+	while(cur != NULL){
+		// printf("cur->path %s\n", cur->path);
+		dirCounty(cur->path, &head, diseaseHashTable, countryHashTable, diseaseHashNum, countryHashNum, capacity, fifosW);
+		// write statistics 
+		// int pid = getpid();
+		// if (write(fifosW, &pid, sizeof(int)) == -1){ 
+		// 	perror("write");
+		// 	return -1;
+		// }
+		cur = cur->next;
+	}
 
-
-
+	//write -15 indication that i finished with stats
+ 	int end = -15;
+	if (write(fifosW, &end, sizeof(int)) == -1){ 
+		perror("write");
+		// return -1;
+	}
 
 
 	/* blocking pipe*/
 
 
+
+	/*non-blocking pipe*/
 	// while(1)
 	// {
 	//    	while (read(fifosR, &size, sizeof(int)) < 0){ 
@@ -153,7 +169,7 @@ int main(int argc, char *argv[])
 	// 	        printf("(pipe empty)\n"); 
 	// 	        sleep(1);
 	// 	        // break; 
-	// 	    } 
+	// 	    } 	
 	// 		// printf("bytesread < 0 \n");
 	// 	    // break;
 	//     	bytesread = read(fifosR, buffer, size);
@@ -175,16 +191,19 @@ int main(int argc, char *argv[])
 
 	// }
 
+	/*non-blocking pipe*/
 
 
 
+	
+	
 
 
 	
 
     // print_list(head);
    	// print_ranges(diseaseHashTable, diseaseHashNum);
-	print_path_list(path_head);
+	// print_path_list(path_head);
 
 	// close(fifofds);
 	free_path_list(path_head);

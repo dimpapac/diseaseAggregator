@@ -9,6 +9,8 @@
 #include <fcntl.h> // for open
 #include <unistd.h> // for close
 #include <signal.h>
+#include <errno.h> 
+
 
 
 
@@ -225,6 +227,102 @@ int main(int argc, char *argv[])
 
 	}
 	
+
+	// ranges *worker_ranges = malloc(sizeof(ranges)); 
+	// int cpid = 0; 
+	// int ret = 0;
+ //    for (int i = 0; i < numWorkers; i++)
+	// {
+ //        // printf("sizeOfMessage dA  -- %d\n", size);
+ //       	//write size of message 
+ //       	if ((ret = read(fifosR[i], &cpid, sizeof(int))) == -1){ 
+	// 		perror("read ranges");
+	// 		return -1;
+	// 	}
+	// 	printf("ret %d\n", ret);
+
+	// }
+
+
+
+	/*non-blocking pipe*/
+	int size = 0; 
+	// int ret = 0;
+	char stats[1000];
+    for (int i = 0; i < numWorkers; i++)
+	{
+        while(1)
+		{
+		   	while (read(fifosR[i], &size, sizeof(int)) < 0){ 
+		   		// if (errno == EAGAIN) { 
+			    //     printf("(pipe empty)\n"); 
+			    //     sleep(1);
+			    //     // break; 
+			    // }
+			    // printf("PAMELIGO\n");
+			}
+	    	// printf("sizeOfMessage in worker  %d  ----pid: %d\n", size, getpid());
+	    	// printf("size %d\n", size);
+	    	// break;
+	    	if (size == -15)
+	    	{
+	    		printf("TELOS\n");
+	    		break;
+	    	}
+	    	// sleep(1);
+
+	    	while (read(fifosR[i], stats, size) < 0){ 
+		   		// if (errno == EAGAIN) { 
+			    //     printf("(pipe empty)\n"); 
+			    //     sleep(1);
+			    //     // break; 
+			    // }
+			    // printf("PAMELIGO\n");
+			}
+
+			// printf("STATS IN DISEASE %s\n", stats);
+			printf("%s\n", stats);
+
+		}
+
+	}
+
+	
+
+	/*non-blocking pipe*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // cli();
 
 
