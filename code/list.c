@@ -157,6 +157,18 @@ void print_path_list(paths_list_node *head){
 	}
 }
 
+void print_path_list_with_pid(paths_list_node *head, int pid){
+	// printf("--------------PRINTING LIST--------------\n");
+	// if (head == NULL)
+	// 	return;
+
+	while(head != NULL){
+		// printf("kalispera apo print list\n");
+		printf("%s %d\n", head->path, pid);
+		head = head->next;
+	}
+}
+
 
 void free_path_list(paths_list_node *head){
 	paths_list_node *tmp = NULL;

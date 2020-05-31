@@ -7,8 +7,8 @@
 // #include "heap.h"
 
 
-
-void cli();
+void listCountries(paths_list_node **list_head, int *pids, int numWorkers);
+void cli(paths_list_node **list_head, int *pids, int numWorkers);
 int dirCounty(char *buffer, list_node **head, bucket **diseaseHashTable, bucket **countryHashTable, int, int, int, int);
 
 void print_ranges(bucket **HashTable, int HashNum);

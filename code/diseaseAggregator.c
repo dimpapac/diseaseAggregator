@@ -16,7 +16,7 @@
 
 #include "structs.h"
 #include "functions.h"
-// #include "list.h"
+#include "list.h"
 // #include "rbt.h"
 // #include "heap.h"
 
@@ -68,6 +68,13 @@ int main(int argc, char *argv[])
 	char **readFifosNames = malloc(sizeof(char *) * numWorkers); //hold names of pipes for reading 
 	char **writeFifosNames = malloc(sizeof(char *) * numWorkers); //hold names of pipes for writing
 	
+
+
+	paths_list_node **list_head = malloc(sizeof(paths_list_node *) * numWorkers); //head of path lists
+	for (int i = 0; i < numWorkers; i++)
+		list_head[i] = NULL;
+
+
 	int *pids;
 	pids = malloc(sizeof(int) * numWorkers); // pids of children
 	// int fifos[numWorkers];
@@ -183,7 +190,9 @@ int main(int argc, char *argv[])
                 continue;
             sprintf(path, "%s/%s", input_dir, entry->d_name);
             path[strlen(path)] = '\0'; 
-            // printf("%s\n", entry->d_name);
+            // printf("ENTRY->D_NAME   %s\n", entry->d_name);
+			append_path_list(&list_head[counter], entry->d_name);
+
             // printf("%s\n", path);
             // snprintf(sizeOfMessage, sizeof(int), "%d", strlen(path));
             // printf("sizeOfMessage   %s\n", sizeOfMessage);
@@ -280,7 +289,6 @@ int main(int argc, char *argv[])
 			    // printf("PAMELIGO\n");
 			}
 
-			// printf("STATS IN DISEASE %s\n", stats);
 			printf("%s\n", stats);
 
 		}
@@ -294,6 +302,12 @@ int main(int argc, char *argv[])
 
 
 
+	// for (int i = 0; i < numWorkers; i++){
+	// 	if (list_head[i] != NULL){
+	// 		// printf("okrrr %s %d\n", list_head[i]->path, pids[i]);
+	// 		print_path_list_with_pid(list_head[i], pids[i]);
+	// 	}
+	// }
 
 
 
@@ -321,9 +335,7 @@ int main(int argc, char *argv[])
 
 
 
-
-
-    // cli();
+    cli(list_head, pids, numWorkers);
 
 
 	// printf("unlink of diseaseAggregator\n");

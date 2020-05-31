@@ -13,7 +13,22 @@
 // #include "heap.h"
 
 
-void cli(){
+
+void listCountries(paths_list_node **list_head, int *pids, int numWorkers){
+
+	for (int i = 0; i < numWorkers; i++){
+		if (list_head[i] != NULL){
+			// printf("okrrr %s %d\n", list_head[i]->path, pids[i]);
+			print_path_list_with_pid(list_head[i], pids[i]);
+		}
+	}
+}
+
+
+
+
+
+void cli(paths_list_node **list_head, int *pids, int numWorkers){
 
 	ssize_t lineSize;
 	
@@ -31,7 +46,7 @@ void cli(){
 /*1*/	if (strncmp(command, "/listCountries", strlen("/listCountries")) == 0 || strncmp(command, "lc", strlen("lc")) == 0) {
 			printf("/listCountries\n");
 			
-			
+			listCountries(list_head, pids, numWorkers);
 
 /*2*/	} else if (strncmp(command, "/diseaseFrequency", strlen("/diseaseFrequency")) == 0 || strncmp(command, "df", strlen("df")) == 0) {
 			printf("/diseaseFrequency\n");
