@@ -42,9 +42,9 @@ void stats2dates(bucket **diseaseHashTable, int diseaseHashNum, char *date1, cha
 
 
 int numberOfOutbreaks2dates1country(rb_node *root, date date1, date date2, char *country, char *virusName);
-void frequency(bucket **HashTable, int HashNum, char *date1, char *date2, char *virusName);
+void frequency(bucket **HashTable, int HashNum, char *date1, char *date2, char *virusName, int fifosW);
 
-void frequencyWithCountry(bucket **HashTable, int HashNum, char *date1, char *date2, char *virusName, char *country);
+void frequencyWithCountry(bucket **HashTable, int HashNum, char *date1, char *date2, char *virusName, char *country, int fifosW);
 
 int numberOfPatients(rb_node *root, char *disease);
 void currentPatients(bucket **HashTable, int HashNum);

@@ -32,6 +32,7 @@ void handler(){
 
 int main(int argc, char *argv[])
 {
+
 	// printf("kalispera apo worker %d\n", getpid());
 	// printf("%s%s and name of pipe is--- %s --- %s \n", argv[0], argv[1], argv[2], argv[3], argv[4]);
 	// printf("argv0 %s\n", argv[0]);
@@ -142,6 +143,39 @@ int main(int argc, char *argv[])
 
 
 	/* blocking pipe*/
+
+
+
+	/* blocking pipe*/
+	while(1){
+		// printf("PRIN\n");
+	  	int retVal = read(fifosR, &size, sizeof(int));
+		// printf("META\n");
+	  	// printf("retVal %d\n", retVal);
+	    if (retVal == -1)
+	    {
+	    	// continue;
+	    }
+		bytesread = read(fifosR, buffer, size);
+		// printf("bytesread %d\n", bytesread);
+	   
+	    buffer[size] = '\0';
+	    // printf("Received: %s  ----  bytesread: %d\n", buffer, bytesread);
+	    // sleep(3);
+	    if (strcmp(buffer, "EOM") == 0)
+	    {
+	    	printf("EOM Received\n");
+	    	// break;
+	    }
+	    // printf("Received: %s  ----  bytesread: %d -----pid: %d\n", buffer, bytesread, getpid());
+
+			// sleep(1);
+
+	    worker_response(buffer, diseaseHashTable, diseaseHashNum, countryHashTable, countryHashNum, head, path_head, fifosW);
+
+	}
+
+
 
 
 

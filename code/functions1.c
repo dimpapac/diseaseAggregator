@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <unistd.h>
 
 #include "structs.h"
 #include "rbt.h"
@@ -293,7 +293,6 @@ void insert_entry_to_bucket(bucket *last_bucket, char *diseaseIDorc, list_node *
 		//deikti red black komvou = new_node
 		last_bucket->entries[last_bucket->currentNumberOfEntries].root->listPtr = new_node;
 
-		last_bucket->currentNumberOfEntries++;
 
 		//field 3
 		if (new_node->data->age > 0 && new_node->data->age < 21){
@@ -316,6 +315,7 @@ void insert_entry_to_bucket(bucket *last_bucket, char *diseaseIDorc, list_node *
 			printf("problem\n");
 		}
 
+		last_bucket->currentNumberOfEntries++;
 	}	
 	else //needs a new bucket
 	{
@@ -329,8 +329,6 @@ void insert_entry_to_bucket(bucket *last_bucket, char *diseaseIDorc, list_node *
 		//deikti red black komvou = new_node
 		new_bucket->entries[0].root->listPtr = new_node;
 
-		new_bucket->currentNumberOfEntries++;
-		last_bucket->next = new_bucket;	
 
 		//field 3
 		if (new_node->data->age > 0 && new_node->data->age < 21){
@@ -352,6 +350,9 @@ void insert_entry_to_bucket(bucket *last_bucket, char *diseaseIDorc, list_node *
 		else{
 			printf("problem\n");
 		}
+
+		new_bucket->currentNumberOfEntries++;
+		last_bucket->next = new_bucket;	
 	}
 }
 
@@ -734,7 +735,7 @@ void stats2dates(bucket **HashTable, int HashNum, char *date1, char *date2){
 
 
 
-void frequency(bucket **HashTable, int HashNum, char *date1, char *date2, char *virusName){
+void frequency(bucket **HashTable, int HashNum, char *date1, char *date2, char *virusName, int fifosW){
 	date idate1, idate2;
 	
 	if (charToDate(date1, &idate1) != 0 || charToDate(date2, &idate2) != 0 || earlier(&idate2, &idate1) == 1)
@@ -752,7 +753,15 @@ void frequency(bucket **HashTable, int HashNum, char *date1, char *date2, char *
 	 	if (strcmp(HashTable[hashValue]->entries[j].nameOfdiseaseORc, virusName) == 0 && HashTable[hashValue]->entries[j].root != NULL)
 	 	{
 	 		// printf("number of outbreaks for disease %s: %d\n" , virusName, numberOfOutbreaks2dates(HashTable[hashValue]->entries[j].root, idate1, idate2));
-	 		printf("%s %d\n" , virusName, numberOfOutbreaks2dates(HashTable[hashValue]->entries[j].root, idate1, idate2));
+	 		// printf("%s %d\n" , virusName, numberOfOutbreaks2dates(HashTable[hashValue]->entries[j].root, idate1, idate2));
+
+	 		int sendValue = numberOfOutbreaks2dates(HashTable[hashValue]->entries[j].root, idate1, idate2);
+
+			if (write(fifosW, &sendValue, sizeof(int)) == -1){ 
+				perror("write");
+				// return -1;
+			} 
+
 	 		return;
 	 	}
 	} 
@@ -764,7 +773,15 @@ void frequency(bucket **HashTable, int HashNum, char *date1, char *date2, char *
 	 		if (strcmp(last_bucket->entries[k].nameOfdiseaseORc, virusName) == 0 && last_bucket->entries[k].root != NULL)
 	 		{
 	 			// printf("number of outbreaks for disease %s: %d\n" , virusName, numberOfOutbreaks2dates(last_bucket->entries[k].root, idate1, idate2));
-	 			printf("%s %d\n" , virusName, numberOfOutbreaks2dates(last_bucket->entries[k].root, idate1, idate2));
+	 			// printf("%s %d\n" , virusName, numberOfOutbreaks2dates(last_bucket->entries[k].root, idate1, idate2));
+	 			
+	 			int sendValue = numberOfOutbreaks2dates(last_bucket->entries[k].root, idate1, idate2);
+
+				if (write(fifosW, &sendValue, sizeof(int)) == -1){ 
+					perror("write");
+					// return -1;
+				} 
+
 	 			return;
 	 		}
 		}
@@ -772,6 +789,11 @@ void frequency(bucket **HashTable, int HashNum, char *date1, char *date2, char *
 	}
 
 	printf("No outbreaks found\n");
+	int zero = 0;
+	if (write(fifosW, &zero, sizeof(int)) == -1){ 
+		perror("write");
+		// return -1;
+	} 
 		
 
 }
@@ -779,7 +801,7 @@ void frequency(bucket **HashTable, int HashNum, char *date1, char *date2, char *
 
 
 //find the red black tree  and pass it to numberOfOutbreaks2dates1country
-void frequencyWithCountry(bucket **HashTable, int HashNum, char *date1, char *date2, char *virusName, char *country){
+void frequencyWithCountry(bucket **HashTable, int HashNum, char *date1, char *date2, char *virusName, char *country, int fifosW){
 	date idate1, idate2;
 	
 	if (charToDate(date1, &idate1) != 0 || charToDate(date2, &idate2) != 0 || earlier(&idate2, &idate1) == 1)
@@ -799,7 +821,14 @@ void frequencyWithCountry(bucket **HashTable, int HashNum, char *date1, char *da
 	 	if (strcmp(HashTable[hashValue]->entries[j].nameOfdiseaseORc, country) == 0 && HashTable[hashValue]->entries[j].root != NULL)
 	 	{
 	 		// printf("number of outbreaks for country %s: %d\n" , country, numberOfOutbreaks2dates1country(HashTable[hashValue]->entries[j].root, idate1, idate2, country, virusName));
-	 		printf("%s %d\n" , virusName, numberOfOutbreaks2dates1country(HashTable[hashValue]->entries[j].root, idate1, idate2, country, virusName));
+	 		// printf("%s %d\n" , virusName, numberOfOutbreaks2dates1country(HashTable[hashValue]->entries[j].root, idate1, idate2, country, virusName));
+
+	 		int sendValue = numberOfOutbreaks2dates1country(HashTable[hashValue]->entries[j].root, idate1, idate2, country, virusName);
+
+			if (write(fifosW, &sendValue, sizeof(int)) == -1){ 
+				perror("write");
+				// return -1;
+			} 
 	 		return;
 	 	}
 	} 
@@ -811,7 +840,15 @@ void frequencyWithCountry(bucket **HashTable, int HashNum, char *date1, char *da
 	 		if (strcmp(last_bucket->entries[k].nameOfdiseaseORc, country) == 0 && last_bucket->entries[k].root != NULL)
 	 		{
 	 			// printf("number of outbreaks for country %s: %d\n" , country, numberOfOutbreaks2dates1country(last_bucket->entries[k].root, idate1, idate2, country, virusName));
-	 			printf("%s %d\n" , virusName, numberOfOutbreaks2dates1country(last_bucket->entries[k].root, idate1, idate2, country, virusName));
+	 			// printf("%s %d\n" , virusName, numberOfOutbreaks2dates1country(last_bucket->entries[k].root, idate1, idate2, country, virusName));
+	 			
+	 			int sendValue = numberOfOutbreaks2dates1country(last_bucket->entries[k].root, idate1, idate2, country, virusName);
+
+				if (write(fifosW, &sendValue, sizeof(int)) == -1){ 
+					perror("write");
+					// return -1;
+				} 
+
 	 			return;
 	 		}
 		}
@@ -819,6 +856,13 @@ void frequencyWithCountry(bucket **HashTable, int HashNum, char *date1, char *da
 	}
 
 	printf("No outbreaks found\n");
+
+	int zero = 0;
+	if (write(fifosW, &zero, sizeof(int)) == -1){ 
+		perror("write");
+		// return -1;
+	} 
+		
 
 }
 

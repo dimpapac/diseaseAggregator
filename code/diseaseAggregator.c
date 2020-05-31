@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
     char *EOM = "EOM";
     for (int i = 0; i < numWorkers; i++)
 	{
-		int size = (int) strlen(EOM);
+		int size = (int) strlen(EOM) + 1;
         // printf("sizeOfMessage dA  -- %d\n", size);
        	//write size of message 
        	if (write(fifosW[i], &size, sizeof(int)) == -1){ 
@@ -275,7 +275,7 @@ int main(int argc, char *argv[])
 	    	// break;
 	    	if (size == -15)
 	    	{
-	    		printf("TELOS\n");
+	    		// printf("TELOS\n");
 	    		break;
 	    	}
 	    	// sleep(1);
@@ -335,7 +335,7 @@ int main(int argc, char *argv[])
 
 
 
-    cli(list_head, pids, numWorkers);
+    cli(list_head, pids, numWorkers, fifosR, fifosW);
 
 
 	// printf("unlink of diseaseAggregator\n");
