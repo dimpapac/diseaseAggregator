@@ -21,8 +21,19 @@
 // #include "heap.h"
 
 
+
+// void handler(int sig){
+// 	printf("diseaseAggregator: I have received a sigint/sigquit\n");
+
+// }
+
+
+
 int main(int argc, char *argv[])
 {
+
+	// signal(SIGINT, handler);
+	// signal(SIGQUIT, handler);
 
 	if (argc != 7)
 	{
@@ -80,7 +91,8 @@ int main(int argc, char *argv[])
 	// int fifos[numWorkers];
 	int *fifosR= malloc(sizeof(int) * numWorkers);
 	int *fifosW= malloc(sizeof(int) * numWorkers);
-	printf("NUMBER OF Workers %d\n", numWorkers);
+	// printf("NUMBER OF Workers %d\n", numWorkers);
+	printf("Waiting for statistics...\n");
 	for (int i = 0; i < numWorkers; i++){ //for each worker
 		
 		readFifosNames[i] = malloc((strlen("/tmp/pipeR") + 3) * sizeof(char));
@@ -295,7 +307,7 @@ int main(int argc, char *argv[])
 
 	}
 
-	
+	printf("PROCESS ID: %d\n", getpid());
 
 	/*non-blocking pipe*/
 
@@ -308,24 +320,6 @@ int main(int argc, char *argv[])
 	// 		print_path_list_with_pid(list_head[i], pids[i]);
 	// 	}
 	// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

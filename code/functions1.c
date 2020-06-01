@@ -647,6 +647,31 @@ int numberOfOutbreaks2dates1country(rb_node *root, date date1, date date2, char 
     return (numberOfOutbreaks2dates1country(root->left, date1, date2, country, virusName) + numberOfOutbreaks2dates1country(root->right, date1, date2, country, virusName)); 
 }
 
+
+// date1<= root->date <=date2
+//return the number of outbreaks of disease for country from a red black tree between date1 and date2 
+int numberOfOutbreaks2dates1countryExitDate(rb_node *root, date date1, date date2, char *country, char *virusName){
+    // printf("kalispera\n");
+    if (root == NULL)
+        return 0;
+
+    if (earlier(&root->data_date, &date1) != 1 && earlier(&root->data_date, &date2) != -1 )
+    {
+    	int k = 0;
+    	list_node *current = root->listPtr;
+    	while(current != NULL && earlier(&current->data->exitDate, &root->data_date) == 0){
+    		if (strcmp(current->data->country, country) == 0 && strcmp(current->data->diseaseID, virusName) == 0)
+    		{
+    			k++;
+    		}
+    			current = current->next;
+    	}
+    	return k + numberOfOutbreaks2dates1countryExitDate(root->left, date1, date2, country, virusName) + numberOfOutbreaks2dates1countryExitDate(root->right, date1, date2, country, virusName);
+    }
+
+    return (numberOfOutbreaks2dates1countryExitDate(root->left, date1, date2, country, virusName) + numberOfOutbreaks2dates1countryExitDate(root->right, date1, date2, country, virusName)); 
+}
+
 // print entries of bucket	
 void stats(bucket **HashTable, int HashNum){
 	if (HashTable == NULL) return;
@@ -865,6 +890,117 @@ void frequencyWithCountry(bucket **HashTable, int HashNum, char *date1, char *da
 		
 
 }
+
+
+
+
+
+//find the red black tree  and pass it to numberOfOutbreaks2dates1country
+void frequencyWithCountryNPAD(bucket **HashTable, int HashNum, char *date1, char *date2, char *virusName, char *country, int fifosW, paths_list_node * path_head, int flag){
+	date idate1, idate2;
+	char dat1[10];
+	char dat2[10];
+	strcpy(dat1, date1);
+	strcpy(dat2, date2);
+	// printf("date1=%s date2=%s\n", date1,date2);
+
+	if (charToDate(dat1, &idate1) != 0 || charToDate(dat2, &idate2) != 0 || earlier(&idate2, &idate1) == 1)
+	{
+		printf("wrong dates frequencyWithCountryNPAD\n");
+		return;
+	}
+
+	int hashValue = hash2(country, HashNum);
+
+	if (HashTable[hashValue] == NULL)
+		return;
+
+	for (int j = 0; j < HashTable[hashValue]->currentNumberOfEntries; j++)
+	{
+	 	// printf("Disease name: %s ", HashTable[hashValue]->entries[j].nameOfdiseaseORc);
+	 	if (strcmp(HashTable[hashValue]->entries[j].nameOfdiseaseORc, country) == 0 && HashTable[hashValue]->entries[j].root != NULL)
+	 	{
+	 		// printf("number of outbreaks for country %s: %d\n" , country, numberOfOutbreaks2dates1country(HashTable[hashValue]->entries[j].root, idate1, idate2, country, virusName));
+	 		// printf("%s %d\n" , virusName, numberOfOutbreaks2dates1country(HashTable[hashValue]->entries[j].root, idate1, idate2, country, virusName));
+	 		int sendValue = 0;
+	 		if (flag == 0)
+	 		{
+	 			sendValue = numberOfOutbreaks2dates1country(HashTable[hashValue]->entries[j].root, idate1, idate2, country, virusName);
+	 		}
+	 		else if(flag == 1)
+	 		{
+	 			sendValue = numberOfOutbreaks2dates1countryExitDate(HashTable[hashValue]->entries[j].root, idate1, idate2, country, virusName);
+	 		}
+	 		char buffer[100];
+	 		sprintf(buffer, "%s %d", country, sendValue);
+	 		// printf("BUFFER IN frequencyWithCountryNPAD-- %s\n", buffer);
+	 		
+	 		int size = (int) strlen(buffer) + 1;
+			if (write(fifosW, &size, sizeof(int)) == -1){ 
+				perror("write");
+				// return -1;
+			} 
+
+			if (write(fifosW, buffer, size) == -1){ 
+				perror("write");
+				// return -1;
+			} 
+
+	 		return;
+	 	}
+	} 
+	bucket * last_bucket = HashTable[hashValue]->next;
+	while (last_bucket != NULL){
+		for (int k = 0; k < last_bucket->currentNumberOfEntries; k++)
+		{
+	 		// printf("Disease name: %s ", last_bucket->entries[k].nameOfdiseaseORc);
+	 		if (strcmp(last_bucket->entries[k].nameOfdiseaseORc, country) == 0 && last_bucket->entries[k].root != NULL)
+	 		{
+	 			// printf("number of outbreaks for country %s: %d\n" , country, numberOfOutbreaks2dates1country(last_bucket->entries[k].root, idate1, idate2, country, virusName));
+	 			// printf("%s %d\n" , virusName, numberOfOutbreaks2dates1country(last_bucket->entries[k].root, idate1, idate2, country, virusName));
+	 			int sendValue = 0;
+	 			if (flag == 0)
+	 			{
+	 				sendValue = numberOfOutbreaks2dates1country(last_bucket->entries[k].root, idate1, idate2, country, virusName);
+	 			}
+	 			else if (flag == 1)
+	 			{
+	 				sendValue = numberOfOutbreaks2dates1countryExitDate(last_bucket->entries[k].root, idate1, idate2, country, virusName);
+	 			}
+
+				char buffer[100];
+		 		sprintf(buffer, "%s %d", country, sendValue);
+	 			// printf("BUFFER IN frequencyWithCountryNPAD-- %s\n", buffer);
+		 		
+		 		int size = (int) strlen(buffer) + 1;
+				if (write(fifosW, &size, sizeof(int)) == -1){ 
+					perror("write");
+					// return -1;
+				} 
+
+				if (write(fifosW, buffer, size) == -1){ 
+					perror("write");
+					// return -1;
+				} 
+
+	 			return;
+	 		}
+		}
+		last_bucket = last_bucket->next; 
+	}
+
+	printf("No outbreaks found\n");
+
+	int zero = 0;
+	if (write(fifosW, &zero, sizeof(int)) == -1){ 
+		perror("write");
+		// return -1;
+	}
+		
+
+}
+
+
 
 
 

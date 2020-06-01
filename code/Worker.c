@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 	// 	perror("fnctl fifoR");
 	// 	return -1; 
 	// }
-	printf("KALISPERA\n");
+	// printf("KALISPERA\n");
 
 	int diseaseHashNum = 7;
 	int countryHashNum = 7;
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 	    	printf("EOM Received\n");
 	    	break;
 	    }
-	    printf("Received: %s  ----  bytesread: %d -----pid: %d\n", buffer, bytesread, getpid());
+	    // printf("Received: %s  ----  bytesread: %d -----pid: %d\n", buffer, bytesread, getpid());
 		append_path_list(&path_head, buffer);
 
 		// sleep(1);
@@ -157,6 +157,10 @@ int main(int argc, char *argv[])
 	    	// continue;
 	    }
 		bytesread = read(fifosR, buffer, size);
+		if (bytesread == -1)
+		{
+			// continue;
+		}
 		// printf("bytesread %d\n", bytesread);
 	   
 	    buffer[size] = '\0';
