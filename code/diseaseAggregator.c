@@ -150,9 +150,6 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	// if (fcntl(p[0], F_SETFL, O_NONBLOCK) < 0) 
- //    	return -1; 
-
 	for (int i = 0; i < numWorkers; i++)
 	{
 		// printf("process id: %d\n", pids[i]);
@@ -198,8 +195,10 @@ int main(int argc, char *argv[])
     while ((entry = readdir(dir)) != NULL) {
         if (entry->d_type == DT_DIR) {
             char *path = malloc(strlen(input_dir) + strlen(entry->d_name) + 2); //size of dir name
-            if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0){
+            	free(path);
                 continue;
+            }
             sprintf(path, "%s/%s", input_dir, entry->d_name);
             path[strlen(path)] = '\0'; 
             // printf("ENTRY->D_NAME   %s\n", entry->d_name);
@@ -223,9 +222,12 @@ int main(int argc, char *argv[])
 				return -1;
 			}
 			sleep(1);
+			free(path);
+
 			counter++;
 			if (counter == numWorkers) 
 				counter = 0;
+
         }
     }
     closedir(dir);
@@ -248,22 +250,6 @@ int main(int argc, char *argv[])
 
 	}
 	
-
-	// ranges *worker_ranges = malloc(sizeof(ranges)); 
-	// int cpid = 0; 
-	// int ret = 0;
- //    for (int i = 0; i < numWorkers; i++)
-	// {
- //        // printf("sizeOfMessage dA  -- %d\n", size);
- //       	//write size of message 
- //       	if ((ret = read(fifosR[i], &cpid, sizeof(int))) == -1){ 
-	// 		perror("read ranges");
-	// 		return -1;
-	// 	}
-	// 	printf("ret %d\n", ret);
-
-	// }
-
 
 
 	/*non-blocking pipe*/
@@ -312,23 +298,6 @@ int main(int argc, char *argv[])
 	/*non-blocking pipe*/
 
 
-
-
-	// for (int i = 0; i < numWorkers; i++){
-	// 	if (list_head[i] != NULL){
-	// 		// printf("okrrr %s %d\n", list_head[i]->path, pids[i]);
-	// 		print_path_list_with_pid(list_head[i], pids[i]);
-	// 	}
-	// }
-
-
-
-
-
-
-
-
-
     cli(list_head, pids, numWorkers, fifosR, fifosW);
 
 
@@ -345,8 +314,42 @@ int main(int argc, char *argv[])
 		}	
 	}
 	
+	char *logfile = malloc(sizeof(char) * (strlen("log_file.") + 10));
 
+	sprintf(logfile, "log_file.%d", getpid());
+	FILE * fp;
+	fp = fopen(logfile, "w");
+	for (int i = 0; i < numWorkers; i++)
+	{
+		paths_list_node *cur = list_head[i];
+		while(cur != NULL){
+			// printf("%s\n", cur->path);
+			fprintf(fp, "%s\n", cur->path);
+			cur = cur->next;
+		}
+	}
 
+	// fprintf(fp, "TOTAL %s\n", );
+	// fprintf(fp, "SUCCESS %s\n", );
+	// fprintf(fp, "FAIL %s\n", );
+
+   	fclose(fp);
+
+   	for (int i = 0; i < numWorkers; i++)
+   	{
+	   	free(readFifosNames[i]); 
+	   	free(writeFifosNames[i]); 
+   		free_path_list(list_head[i]);
+   	}
+
+   	free(input_dir);
+   	free(pids);
+   	free(readFifosNames);
+   	free(writeFifosNames);
+   	free(list_head);
+   	free(fifosR);
+   	free(fifosW);
+	free(logfile);
 	printf("diseaseAggregator exiting...\n");
 	return 0;	
 }

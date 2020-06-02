@@ -118,7 +118,7 @@ make_files () {
     # "$NFPD" "$NRPF" "$DISEASEFILE" 
     for (( i = 0; i < "$2"; i++ )); 
     do
-        echo "kalispera"
+        # echo "kalispera"
         random 0 31
         DAY=$?
         # echo "DAY-------- $DAY"
@@ -160,7 +160,7 @@ while IFS= read -r line
 do
     dirName="$INPUT_DIR/$line"
     mkdir -p "$dirName"
-    printf 'array----------------------- %s\n' "${array[@]}"
+    # printf 'array----------------------- %s\n' "${array[@]}"
     unset array
     make_files "$dirName" "$NFPD" "$NRPF" "$DISEASEFILE"
     # touch "$INPUT_DIR/$line"

@@ -87,17 +87,13 @@ int main(int argc, char *argv[])
 	paths_list_node *path_head = NULL; //head of path list
 
 	int bytesread = 0;
-	// int returnValue = 0;
-	// while(1){
 
 
 	int size = 0;
 
 	/* blocking pipe*/
 	while(1){
-		// printf("PRIN\n");
 	  	int retVal = read(fifosR, &size, sizeof(int));
-		// printf("META\n");
 	  	// printf("retVal %d\n", retVal);
 
 	    if (retVal == -1)
@@ -112,7 +108,7 @@ int main(int argc, char *argv[])
 	    // sleep(3);
 	    if (strcmp(buffer, "EOM") == 0)
 	    {
-	    	printf("EOM Received\n");
+	    	// printf("EOM Received\n");
 	    	break;
 	    }
 	    // printf("Received: %s  ----  bytesread: %d -----pid: %d\n", buffer, bytesread, getpid());
@@ -166,11 +162,11 @@ int main(int argc, char *argv[])
 	    buffer[size] = '\0';
 	    // printf("Received: %s  ----  bytesread: %d\n", buffer, bytesread);
 	    // sleep(3);
-	    if (strcmp(buffer, "EOM") == 0)
-	    {
-	    	printf("EOM Received\n");
-	    	// break;
-	    }
+	    // if (strcmp(buffer, "EOM") == 0)
+	    // {
+	    // 	printf("EOM Received\n");
+	    // 	// break;
+	    // }
 	    // printf("Received: %s  ----  bytesread: %d -----pid: %d\n", buffer, bytesread, getpid());
 
 			// sleep(1);
@@ -178,63 +174,6 @@ int main(int argc, char *argv[])
 	    worker_response(buffer, diseaseHashTable, diseaseHashNum, countryHashTable, countryHashNum, head, path_head, fifosW);
 
 	}
-
-
-
-
-
-	/*non-blocking pipe*/
-	// while(1)
-	// {
-	//    	while (read(fifosR, &size, sizeof(int)) < 0){ 
-	//    		// if (errno == EAGAIN) { 
-	// 	    //     printf("(pipe empty)\n"); 
-	// 	    //     sleep(1);
-	// 	    //     // break; 
-	// 	    // }
-	// 	    printf("PAMELIGO\n");
-	// 	}
- //    	// printf("sizeOfMessage in worker  %d  ----pid: %d\n", size, getpid());
- //    	if (size <= 0) continue;
- //    	// sleep(1);
-
- //    	bytesread = read(fifosR, buffer, size);
-	//     while (bytesread < 0){
-	// 		// sleep(1);
-	// 		// case -1 means pipe is empty and errno 
-	// 	    // set EAGAIN 
-	// 	    if (errno == EAGAIN) { 
-	// 	        printf("(pipe empty)\n"); 
-	// 	        sleep(1);
-	// 	        // break; 
-	// 	    } 	
-	// 		// printf("bytesread < 0 \n");
-	// 	    // break;
-	//     	bytesread = read(fifosR, buffer, size);
-	//     }
-	   
- //        buffer[size] = '\0';
- //        // printf("Received: %s  ----  bytesread: %d\n", buffer, bytesread);
- //        // sleep(3);
- //        if (strcmp(buffer, "EOM") == 0)
- //        {
- //        	printf("EOM Received\n");
- //        	break;
- //        }
- //        printf("Received: %s  ----  bytesread: %d -----pid: %d\n", buffer, bytesread, getpid());
-	// 	append_path_list(&path_head, buffer);
-
-	// 	// dirCounty(buffer, &head, diseaseHashTable, countryHashTable, diseaseHashNum, countryHashNum, capacity);
-	// 	// sleep(1);
-
-	// }
-
-	/*non-blocking pipe*/
-
-
-
-	
-	
 
 
 	
