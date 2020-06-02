@@ -18,15 +18,41 @@
 #include "rbt.h"
 #include "heap.h"
 
+paths_list_node *path_head = NULL; //head of path list
+
+extern int ctotal;
+extern int csuccess;
+extern int cfail;
 
 //function to handle the SIGUSR2 signal 
 
-int flag = 0;
 void handler(){
-	printf("WORKER: I have received a SIGUSR1\n");
-	signal(SIGUSR2, handler);
-	flag = 1;
+	printf("WORKER: I have received a SIGINT/SIGQUIT\n");
+	// signal(SIGUSR2, handler);
 	// signalsReceived++;
+
+	char *logfile = malloc(sizeof(char) * (strlen("log_file.") + 10));
+
+	sprintf(logfile, "log_file.%d", getpid());
+	FILE * fp;
+	fp = fopen(logfile, "w");
+
+	paths_list_node *cur = path_head;
+	while(cur != NULL){
+		// printf("%s\n", cur->path);
+		char * token = strtok(cur->path, "/");
+		token = strtok(NULL, " ");
+		fprintf(fp, "%s\n", token);
+		cur = cur->next;
+	}
+
+	fprintf(fp, "TOTAL %d\n", ctotal);
+	fprintf(fp, "SUCCESS %d\n", csuccess);
+	fprintf(fp, "FAIL %d\n", cfail);
+
+   	fclose(fp);
+
+	// exit(1);
 }
 
 
@@ -42,7 +68,11 @@ int main(int argc, char *argv[])
 	// printf("argv4 %s\n", argv[4]);
 	// printf("BUFFER SIZE IS %d\n", bufferSize);
 
-	signal(SIGUSR2, handler);
+	signal(SIGINT, handler);
+	signal(SIGQUIT, handler);
+	ctotal = 0;
+	csuccess = 0;
+	cfail = 0;
 
 	// char *write_pipe = malloc(sizeof(char)* strlen(argv[2]))
 
@@ -84,7 +114,6 @@ int main(int argc, char *argv[])
 	// printf("capacity %d\n", capacity);
 
 	list_node *head = NULL; // head of list 
-	paths_list_node *path_head = NULL; //head of path list
 
 	int bytesread = 0;
 

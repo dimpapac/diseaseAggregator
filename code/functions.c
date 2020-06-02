@@ -14,6 +14,13 @@
 // #include "heap.h"
 
 
+int pflag;
+int ptotal;
+int psuccess;
+int pfail;
+int ctotal;
+int csuccess;
+int cfail;
 
 
 void listCountries(paths_list_node **list_head, int *pids, int numWorkers){
@@ -77,6 +84,7 @@ void write_line(paths_list_node **list_head, int *pids, int numWorkers, int *fif
 		if (position == -1)
 		{
 			printf("country not exists\n");
+			free(temp_line);
 			return;
 		}
 		else{
@@ -96,6 +104,7 @@ void write_line(paths_list_node **list_head, int *pids, int numWorkers, int *fif
 				// return -1;
 			}
 		}
+		free(temp_line);
 	}
 
 }
@@ -152,6 +161,7 @@ void read_answer(paths_list_node **list_head, int *pids, int numWorkers, int *fi
 			printf("%d\n", returnValue);
 		}
 		
+		free(temp_line);
 	}
 
 }
@@ -185,7 +195,7 @@ void read_answer_string(paths_list_node **list_head, int *pids, int numWorkers, 
 		    		break;
 		    	}
 
-				char *buffer = malloc(sizeof(char) * size);
+				char *buffer = malloc(sizeof(char) * (size + 1));
 				while (read(fifosR[i], buffer, size) < 0){ 
 			   		// if (errno == EAGAIN) { 
 				    //     printf("(pipe empty)\n"); 
@@ -196,6 +206,7 @@ void read_answer_string(paths_list_node **list_head, int *pids, int numWorkers, 
 				}
 				buffer[size] = '\0';
 				printf("%s\n", buffer);
+				free(buffer);
 			}
 
 		}
@@ -234,7 +245,7 @@ void read_answer_string(paths_list_node **list_head, int *pids, int numWorkers, 
 				printf("no outbreaks read_answer_string\n");
 			}
 
-			char *buffer = malloc(sizeof(char) * size);
+			char *buffer = malloc(sizeof(char) * (size + 1));
 			while (read(fifosR[position], buffer, size) < 0){ 
 		   		// if (errno == EAGAIN) { 
 			    //     printf("(pipe empty)\n"); 
@@ -245,8 +256,9 @@ void read_answer_string(paths_list_node **list_head, int *pids, int numWorkers, 
 			}
 			buffer[size] = '\0';
 			printf("%s\n", buffer);
+			free(buffer);
 		}
-		
+		free(temp_line);
 	}
 
 }
@@ -265,6 +277,11 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
 			free(command);
 		command = NULL;
 		printf(">");
+		if (pflag == 1)
+		{
+			break;
+		}
+		// printf("FLAG META DO %d\n", pflag);
 		lineSize = getline(&command, &n, stdin); //get line from stdin
 		command[lineSize - 1] = '\0';
 		// printf("COMMAND: %s\n", command); 
@@ -272,6 +289,8 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
 			// printf("/listCountries\n");
 			
 			listCountries(list_head, pids, numWorkers);
+			ptotal++;
+			psuccess++;
 
 /*2*/	} else if (strncmp(command, "/diseaseFrequency", strlen("/diseaseFrequency")) == 0 || strncmp(command, "df", strlen("df")) == 0) {
 			// printf("/diseaseFrequency\n");
@@ -285,18 +304,27 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
     		char *virusName = strtok(NULL, " ");
     		if (virusName == NULL) {
     			printf("Usage:  /diseaseFrequency virusName date1 date2 [country] \n");
+    			ptotal++;
+    			pfail++;
+    			free(send_line);
     			continue;
 			}// printf("%s\n", virusName);
 
 			char *date1 = strtok(NULL," ");
 			if (date1 == NULL){
 				printf("Usage:  /diseaseFrequency virusName date1 date2 [country] \n");
+    			ptotal++;
+    			pfail++;
+    			free(send_line);
 				continue;
 			}
 
 			char *date2 = strtok(NULL," ");
 			if (date2 == NULL){
 				printf("Usage: /diseaseFrequency virusName date1 date2 [country] \n");
+				ptotal++;
+				pfail++;
+				free(send_line);
 				continue;
 			}
 
@@ -318,31 +346,43 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
 
 			}
 
-			
+			ptotal++;
+			psuccess++;
+			free(send_line);
 
 /*3*/	} else if (strncmp(command, "/topk-AgeRanges", strlen("/topk-AgeRanges")) == 0 || strncmp(command, "topk", strlen("topk")) == 0) {
-			printf("/topk-AgeRanges\n");
+			// printf("/topk-AgeRanges\n");
+			printf("Not implemented\n");
+			continue;
 			char *token = strtok(command," "); //topk
 			if (token == NULL) continue;
     		char *ks = strtok(NULL, " ");
     		if (ks == NULL){
     			printf("Usage: /topk-AgeRanges k country disease date1 date2\n");
+    			ptotal++;
+    			pfail++;
     			continue;
     		}
     		int k = atoi(ks);
     		if (k == 0)
     		{
     			printf("k must be a number\n");
+    			ptotal++;
+    			pfail++;
     			continue;
     		}
     		char *country = strtok(NULL, " ");
     		if (country == NULL){
     			printf("yUsage: /topk-AgeRanges k country disease date1 date2\n");
+    			ptotal++;
+    			pfail++;
     			continue;
     		}
     		char *disease = strtok(NULL, " ");
     		if (disease == NULL){
     			printf("Usage: /topk-AgeRanges k country disease date1 date2\n");
+    			ptotal++;
+    			pfail++;
     			continue;
     		}
     		char *date1 = strtok(NULL, " ");
@@ -358,6 +398,8 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
 				char *date2 = strtok(NULL," ");
 				if (date2 == NULL){
 					printf("you have to give two dates\n");
+					ptotal++;
+    				pfail++;
 					continue;
 				}
 				else {
@@ -372,6 +414,8 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
 				}
 			}
 
+			ptotal++;
+			psuccess++;
 
 /*4*/	} else if (strncmp(command, "/searchPatientRecord", strlen("/searchPatientRecord")) == 0 || strncmp(command, "spr", strlen("spr")) == 0) {
 			// printf("searchPatientRecord\n");
@@ -384,6 +428,9 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
 			if (recordID == NULL){
 				printf("no recordID given\n");
 				free(recordID);
+				ptotal++;
+    			pfail++;
+    			free(send_line);
 				continue;
 			}
 			write_line(list_head, pids, numWorkers, fifosR, fifosW, send_line, flag);
@@ -408,7 +455,7 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
 					continue;
 				}
 
-				char *buffer = malloc(sizeof(char) * size);
+				char *buffer = malloc(sizeof(char) * (size + 1));
 				while (read(fifosR[i], buffer, size) < 0){ 
 			   		// if (errno == EAGAIN) { 
 				    //     printf("(pipe empty)\n"); 
@@ -421,6 +468,8 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
 				printf("%s\n", buffer);
 			
 
+				free(buffer);
+
 			}
 
 			if (counter == numWorkers)
@@ -428,6 +477,9 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
 				printf("recordID not found\n");
 			}
 
+			ptotal++;
+			psuccess++;
+			free(send_line);
 
 /*5*/	} else if (strncmp(command, "/numPatientAdmissions", strlen("/numPatientAdmissions")) == 0 || strncmp(command, "npa", strlen("npa")) == 0) {
 			// printf("/numPatientAdmissions\n");
@@ -441,18 +493,27 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
     		char *virusName = strtok(NULL, " ");
     		if (virusName == NULL) {
     			printf("Usage: /numPatientAdmissions disease date1 date2 [country] \n");
+    			ptotal++;
+    			pfail++;
+    			free(send_line);
     			continue;
 			}// printf("%s\n", virusName);
 
 			char *date1 = strtok(NULL," ");
 			if (date1 == NULL){
 				printf("Usage: /numPatientAdmissions disease date1 date2 [country] \n");
+				ptotal++;
+    			pfail++;
+    			free(send_line);
 				continue;
 			}
 
 			char *date2 = strtok(NULL," ");
 			if (date2 == NULL){
 				printf("Usage: /numPatientAdmissions disease date1 date2 [country] \n");
+				ptotal++;
+    			pfail++;
+    			free(send_line);
 				continue;
 			}
 
@@ -474,7 +535,11 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
 				read_answer_string(list_head, pids, numWorkers, fifosR, fifosW, send_line, flag);
 
 			}
-		
+
+			ptotal++;
+			psuccess++;
+			free(send_line);
+
 /*6*/	} else if (strncmp(command, "/numPatientDischarges", strlen("/numPatientDischarges")) == 0 || strncmp(command, "npd", strlen("npd")) == 0) {
 			// printf("/numPatientDischarges\n");
 			char *send_line = malloc((strlen(command) + 1) * sizeof(char));
@@ -486,19 +551,28 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
     		char *disease = strtok(NULL, " ");
     		if (disease == NULL) {
     			printf("Usage: /numPatientDischarges disease date1 date2 [country] \n");
+    			ptotal++;
+    			pfail++;
     			continue;
+    			free(send_line);
 			}// printf("%s\n", disease);
 
 			char *date1 = strtok(NULL," ");
 			if (date1 == NULL){
 				printf("Usage: /numPatientDischarges disease date1 date2 [country] \n");
+				ptotal++;
+    			pfail++;
 				continue;
+				free(send_line);
 			}
 
 			char *date2 = strtok(NULL," ");
 			if (date2 == NULL){
 				printf("Usage: /numPatientDischarges disease date1 date2 [country] \n");
+				ptotal++;
+    			pfail++;
 				continue;
+				free(send_line);
 			}
 
 			char *country = strtok(NULL," ");
@@ -520,12 +594,19 @@ void cli(paths_list_node **list_head, int *pids, int numWorkers, int *fifosR, in
 
 			}	
 			
+			ptotal++;
+			psuccess++;
+			free(send_line);
 
 		} else if (strcmp(command, "/exit\0") != 0){
 			printf("Wrong command try again\n");
+			ptotal++;
+			pfail++;
 		}
+		// printf("FLAG PRIN WHILE %d\n", pflag);
 
-	} while(strcmp(command, "/exit\0") != 0);
+
+	} while(strcmp(command, "/exit\0")!= 0 && pflag != 1 );
 	printf("exiting\n");
 	if (command != NULL)
 		free(command);
@@ -722,9 +803,13 @@ int dirCounty(char *countryDir, list_node **head, bucket **diseaseHashTable, buc
 				int retVal = recordPatientExit(*head, new_entry->recordID, exitDate);
 				if (retVal == 0){
 					// printf("Record updated\n");
+					ctotal++;
+					csuccess++;
 				}
 				else{
-					printf("ERROR\n");			
+					printf("ERROR\n");
+					ctotal++;
+					cfail++;
 				}
 
 			}
@@ -736,6 +821,8 @@ int dirCounty(char *countryDir, list_node **head, bucket **diseaseHashTable, buc
 				if(search(*head,  new_entry->recordID) != NULL){
 					// printf("%s already exists\n", new_entry->recordID); //old output
  					printf("ERROR\n");
+ 					ctotal++;
+					cfail++;
 					//free entry
 					free(new_entry->recordID);
 					free(new_entry->patientFirstName);
@@ -760,6 +847,9 @@ int dirCounty(char *countryDir, list_node **head, bucket **diseaseHashTable, buc
 				//insert patient to hash tables
 				insert_to_hash(diseaseHashTable, diseaseHashNum, new_node->data->diseaseID, new_node, capacity); 
 				insert_to_hash(countryHashTable, countryHashNum, new_node->data->country, new_node, capacity);
+
+				ctotal++;
+				csuccess++;
 			}
 			else {
 				return -3;

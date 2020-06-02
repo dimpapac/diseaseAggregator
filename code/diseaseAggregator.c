@@ -21,19 +21,30 @@
 // #include "heap.h"
 
 
+extern int pflag;
+extern int ptotal;
+extern int psuccess;
+extern int pfail;
 
-// void handler(int sig){
-// 	printf("diseaseAggregator: I have received a sigint/sigquit\n");
-
-// }
+void handler(int sig){
+	// signal(SIGINT, handler);
+	// signal(SIGQUIT, handler);
+	// printf("diseaseAggregator: I have received a sigint/sigquit\n");
+	pflag = 1;
+	// printf("flag in handler %d\n", pflag);
+}
 
 
 
 int main(int argc, char *argv[])
 {
 
-	// signal(SIGINT, handler);
-	// signal(SIGQUIT, handler);
+	pflag = 0;
+	ptotal = 0;
+	psuccess = 0;
+	pfail = 0;
+	signal(SIGINT, handler);
+	signal(SIGQUIT, handler);
 
 	if (argc != 7)
 	{
@@ -122,7 +133,7 @@ int main(int argc, char *argv[])
 		
 			char * array[8]; //array for execv
 			array[0] = "Worker"; //name of input file
-			array[1] = malloc(sizeof(char)); //number of worker
+			array[1] = malloc(sizeof(char) + 3); //number of worker
 			sprintf(array[1], "%d", i);
 			array[2] = malloc(sizeof(char)*(strlen(readFifosNames[i])+1)); //number of read pipe
 			strcpy(array[2], readFifosNames[i]);
@@ -293,7 +304,7 @@ int main(int argc, char *argv[])
 
 	}
 
-	printf("PROCESS ID: %d\n", getpid());
+	// printf("PROCESS ID: %d\n", getpid());
 
 	/*non-blocking pipe*/
 
@@ -329,9 +340,9 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	// fprintf(fp, "TOTAL %s\n", );
-	// fprintf(fp, "SUCCESS %s\n", );
-	// fprintf(fp, "FAIL %s\n", );
+	fprintf(fp, "TOTAL %d\n", ptotal);
+	fprintf(fp, "SUCCESS %d\n", psuccess);
+	fprintf(fp, "FAIL %d\n", pfail);
 
    	fclose(fp);
 

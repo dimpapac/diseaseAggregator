@@ -26,15 +26,12 @@ random (){
 
     FLOOR=$1
     RANGE=$2
-    # Combine above two techniques to retrieve random number between two limits.
     number=0   #initialize
     while [ "$number" -le $FLOOR ]
     do
     number=$RANDOM
-    let "number %= $RANGE"  # Scales $number down within $RANGE.
+    let "number %= $RANGE"  
     done
-    # echo "Random number between $FLOOR and $RANGE ---  $number"
-    # echo
     return "$number"  
 }
 
@@ -49,29 +46,22 @@ random_string () {
     done
 
     echo "$name"
-    # echo $?
-    # return "$name"
 }
 
+#create record and write to file
 write_file () {
     df="$2"
 
 
     output=$(eval "wc -l < $df")
-    # echo "$output"
     output=$((output + 1))
     random 0 "$output"
     num=$?
-    # echo "$num"
     
     dis=$(eval "sed '$num!d' "$df"")
-    # echo "$dis"
-    # random_string
+
     ret_name=$(random_string)    
-    # echo "$ret_name"
-    # random_string
     ret_surname=$(random_string)
-    # echo "$ret_surname"
     arr[0]="ENTER"
     arr[1]="EXIT"
 
@@ -82,43 +72,37 @@ write_file () {
     oldid=$ID
     if [[ "${arr[$rand]}" == "ENTER" ]];
     then
-        array+=($ID)
+        array+=($ID) #add id to the array
         # echo "ENTER ENTRY"
     else
         # echo "EXIT ENTRY"
         if [[ "${#array[@]}" != "0" ]]; then
             # echo "non empty array"
-            oldid=${array[-1]}
+            oldid=${array[-1]} #take the last item of the array
             # echo "$oldid"
-            unset 'array[-1]'
+            unset 'array[-1]' #remove item from the array
         fi
     fi
     echo "$oldid ${arr[$rand]} $ret_name $ret_surname $dis $age" >> "$1"
-    # echo "ade gami" 
     ID=$((ID + 1))
 }
 
+#create nrpf entries for file
 new_entry () {
     # echo "$1 $2 $3"
     # "$3" "$DIR/$DAY-$MONTH-20$YEAR" "$DISEASEFILE"
     for (( j = 0; j < "$1"; j++ )); 
     do
-        # echo "stili1 stili2 stili3" > "$2"
-        # echo "kalispera"
         write_file "$2" "$3"
-        # echo $?
     done
-    # echo
 }
 
-
+#make nfpd files inside subdirectory
 make_files () {
-    # echo kalispera
     # echo "$2 $3 $4"
     # "$NFPD" "$NRPF" "$DISEASEFILE" 
     for (( i = 0; i < "$2"; i++ )); 
     do
-        # echo "kalispera"
         random 0 31
         DAY=$?
         # echo "DAY-------- $DAY"
@@ -161,16 +145,8 @@ do
     dirName="$INPUT_DIR/$line"
     mkdir -p "$dirName"
     # printf 'array----------------------- %s\n' "${array[@]}"
-    unset array
+    unset array #clear array with entries
     make_files "$dirName" "$NFPD" "$NRPF" "$DISEASEFILE"
     # touch "$INPUT_DIR/$line"
     
 done < "$COUNTRIESILE"
-
-# mkdir -p $3/{1..10}/
- # | touch images/{100..110}/192x128/index.md
-
-
-
-
-exit 0
